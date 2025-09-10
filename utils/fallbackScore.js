@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 const fallbackScore = (query, product) => {
   const q = query.toLowerCase().split(/\s+/).filter(w => w.length > 2); // ignore very short words
   const name = product.product_name.toLowerCase();
@@ -21,6 +23,7 @@ const applyFallbackScore = (query, items) => {
   return items.map(item => ({
     ...item,
     score: fallbackScore(query, item.product),
+    uid: uuidv4(),   //unique id for each response/item
   }));
 }
 

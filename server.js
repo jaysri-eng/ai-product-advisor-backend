@@ -4,6 +4,8 @@ import catalog from "./catalog.json" assert { type: "json" };
 import cors from "cors";
 import "dotenv/config";
 import applyFallbackScore from "./utils/fallbackScore.js";
+import { v4 as uuidv4 } from "uuid";
+
 console.log("✅ Imports loaded successfully");
 
 const app = express();
@@ -95,6 +97,9 @@ app.post("/recommend", async (req, res) => {
       // Apply fallback scoring
       recommendations = applyFallbackScore(query, filteredItems);
 
+      // Attach UUIDs
+      // recommendations = recommendations.map(r => ({ ...r, uid: uuidv4() }))
+
       // Full fallback if nothing survived filtering
       if (recommendations.length === 0) {
         recommendations = applyFallbackScore(
@@ -104,7 +109,10 @@ app.post("/recommend", async (req, res) => {
             reason: `Matched keywords in your query with product "${p.product_name}"`,
             score: 0,
           }))
-        ).sort((a, b) => b.score - a.score).slice(0, 3);
+        )
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        // .map(r=>({...r,uid:uuidv4()}));
       }
     } catch {
       // Parsing failed → fallback entirely
@@ -115,7 +123,10 @@ app.post("/recommend", async (req, res) => {
           reason: `Matched keywords in your query with product "${p.product_name}"`,
           score: 0,
         }))
-      ).sort((a, b) => b.score - a.score).slice(0, 3);
+      )
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3)
+      // .map(r => ({ ...r, uid: uuidv4() }));;
     }
 
     res.json({ recommendations });
